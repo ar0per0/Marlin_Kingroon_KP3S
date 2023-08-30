@@ -1402,7 +1402,7 @@ void MarlinUI::init() {
 
   bool MarlinUI::has_status() { return (status_message[0] != '\0'); }
 
-  void MarlinUI::set_status(const char * const cstr, const bool persist) {
+  void MarlinUI::set_status(const char * const cstr, const bool persist/*=false*/, const int8_t secons/*=0*/) {
     if (alert_level) return;
 
     TERN_(HOST_STATUS_NOTIFICATIONS, hostui.notify(cstr));
@@ -1426,7 +1426,7 @@ void MarlinUI::init() {
     strncpy(status_message, cstr, maxLen);
     status_message[maxLen] = '\0';
 
-    finish_status(persist);
+    finish_status(persist, secons);
   }
 
   /**
@@ -1534,13 +1534,13 @@ void MarlinUI::init() {
     finish_status(level > 0);
   }
 
-  void MarlinUI::finish_status(const bool persist) {
+  void MarlinUI::finish_status(const bool persist, const int8_t secons/*=0*/) {
 
     UNUSED(persist);
 
     set_status_reset_fn();
 
-    TERN_(HAS_STATUS_MESSAGE_TIMEOUT, status_message_expire_ms = persist ? 0 : millis() + (STATUS_MESSAGE_TIMEOUT_SEC) * 1000UL);
+    TERN_(HAS_STATUS_MESSAGE_TIMEOUT, status_message_expire_ms = persist ? 0 : millis() + (secons ? secons : (STATUS_MESSAGE_TIMEOUT_SEC)) * 1000UL);
 
     #if HAS_WIRED_LCD
 
@@ -1614,15 +1614,21 @@ void MarlinUI::init() {
 
   void MarlinUI::abort_print() {
     #if ENABLED(SDSUPPORT)
+    if(IS_SD_PRINTING()){
       wait_for_heatup = wait_for_user = false;
       card.abortFilePrintSoon();
+      LCD_MESSAGE(MSG_PRINT_ABORTED);
+      extern bool printFi;
+      printFi = true;
+    }
+    else
+      queue.inject(F("M112"));
     #endif
     #ifdef ACTION_ON_CANCEL
       hostui.cancel();
     #endif
     IF_DISABLED(SDSUPPORT, print_job_timer.stop());
     TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_INFO, F("UI Aborted"), FPSTR(DISMISS_STR)));
-    LCD_MESSAGE(MSG_PRINT_ABORTED);
     TERN_(HAS_MARLINUI_MENU, return_to_status());
   }
 
@@ -1780,6 +1786,7 @@ void MarlinUI::init() {
     #if ENABLED(TOUCH_SCREEN_CALIBRATION)
       if (touch_calibration.need_calibration()) ui.goto_screen(touch_screen_calibration);
     #endif
+    return_to_status();
   }
 
   #if EITHER(BABYSTEP_ZPROBE_GFX_OVERLAY, MESH_EDIT_GFX_OVERLAY)
@@ -1838,10 +1845,12 @@ void MarlinUI::init() {
     void MarlinUI::load_settings() {
       const bool good = settings.load();
       completion_feedback(good);
+      return_to_status();
     }
     void MarlinUI::store_settings() {
       const bool good = settings.save();
       completion_feedback(good);
+      return_to_status();
     }
   #endif
 

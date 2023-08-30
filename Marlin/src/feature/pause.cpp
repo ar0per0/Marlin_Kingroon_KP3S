@@ -267,34 +267,38 @@ bool load_filament(const_float_t slow_load_length/*=0*/, const_float_t fast_load
     wait_for_user = false;
 
   #else
+    auto lwait = [&](){
+      KEEPALIVE_STATE(PAUSED_FOR_USER);
+      wait_for_user = false;
+      ui.pause_show_message(PAUSE_MESSAGE_OPTION); // Also sets PAUSE_RESPONSE_WAIT_FOR
+      pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;
+    };
 
+    lwait();
     do {
-      if (purge_length > 0) {
-        // "Wait for filament purge"
-        if (show_lcd) ui.pause_show_message(PAUSE_MESSAGE_PURGE);
+      if(pause_menu_response == PAUSE_RESPONSE_EXTRUDE_MORE){
+        if (purge_length > 0) {
+          // "Wait for filament purge"
+          if (show_lcd) ui.pause_show_message(PAUSE_MESSAGE_PURGE);
 
-        // Extrude filament to get into hotend
-        unscaled_e_move(purge_length, ADVANCED_PAUSE_PURGE_FEEDRATE);
+          // Extrude filament to get into hotend
+          unscaled_e_move(purge_length, ADVANCED_PAUSE_PURGE_FEEDRATE);
+        }
+        TERN_(HOST_PROMPT_SUPPORT, hostui.filament_load_prompt()); // Initiate another host prompt.
+        lwait();
       }
 
-      TERN_(HOST_PROMPT_SUPPORT, hostui.filament_load_prompt()); // Initiate another host prompt.
+      if(pause_menu_response == PAUSE_RESPONSE_UNLOAD_FILAMENT){
+        const float unload_length = -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_extruder].unload_length));
+        unload_filament(unload_length, true, PAUSE_MODE_UNLOAD_FILAMENT);
+        lwait();
+      }
 
-      #if M600_PURGE_MORE_RESUMABLE
-        if (show_lcd) {
-          // Show "Purge More" / "Resume" menu and wait for reply
-          KEEPALIVE_STATE(PAUSED_FOR_USER);
-          wait_for_user = false;
-          #if EITHER(HAS_MARLINUI_MENU, DWIN_LCD_PROUI)
-            ui.pause_show_message(PAUSE_MESSAGE_OPTION); // Also sets PAUSE_RESPONSE_WAIT_FOR
-          #else
-            pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;
-          #endif
-          while (pause_menu_response == PAUSE_RESPONSE_WAIT_FOR) idle_no_sleep();
-        }
-      #endif
+      if(pause_menu_response == PAUSE_RESPONSE_WAIT_FOR)
+        idle_no_sleep();
 
       // Keep looping if "Purge More" was selected
-    } while (TERN0(M600_PURGE_MORE_RESUMABLE, pause_menu_response == PAUSE_RESPONSE_EXTRUDE_MORE));
+    } while (pause_menu_response != PAUSE_RESPONSE_RESUME_PRINT);
 
   #endif
   TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_end());
@@ -509,14 +513,12 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
   DEBUG_ECHOLNPGM("... is_reload:", is_reload, " maxbeep:", max_beep_count DXC_SAY);
 
   bool nozzle_timed_out = false;
-
   show_continue_prompt(is_reload);
-
   first_impatient_beep(max_beep_count);
 
   // Start the heater idle timers
+  const celsius_t nozzleTargetHot = thermalManager.degTargetHotend(0);
   const millis_t nozzle_timeout = SEC_TO_MS(PAUSE_PARK_NOZZLE_TIMEOUT);
-
   HOTEND_LOOP() thermalManager.heater_idle[e].start(nozzle_timeout);
 
   #if ENABLED(DUAL_X_CARRIAGE)
@@ -529,6 +531,7 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
   KEEPALIVE_STATE(PAUSED_FOR_USER);
   TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_do(PROMPT_USER_CONTINUE, GET_TEXT_F(MSG_NOZZLE_PARKED), FPSTR(CONTINUE_STR)));
   TERN_(EXTENSIBLE_UI, ExtUI::onUserConfirmRequired(GET_TEXT_F(MSG_NOZZLE_PARKED)));
+
   wait_for_user = true;    // LCD click or M108 will clear this
   while (wait_for_user) {
     impatient_beep(max_beep_count);
@@ -542,21 +545,28 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
     if (nozzle_timed_out) {
       ui.pause_show_message(PAUSE_MESSAGE_HEAT);
       SERIAL_ECHO_MSG(_PMSG(STR_FILAMENT_CHANGE_HEAT));
-
       TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_do(PROMPT_USER_CONTINUE, GET_TEXT_F(MSG_HEATER_TIMEOUT), GET_TEXT_F(MSG_REHEAT)));
 
-      TERN_(EXTENSIBLE_UI, ExtUI::onUserConfirmRequired(GET_TEXT_F(MSG_HEATER_TIMEOUT)));
+      //Hotend off
+      HOTEND_LOOP() {
+        thermalManager.setTargetHotend(0, e);
+        thermalManager.temp_hotend[e].soft_pwm_amount = 0;
+      }
 
+      TERN_(EXTENSIBLE_UI, ExtUI::onUserConfirmRequired(GET_TEXT_F(MSG_HEATER_TIMEOUT)));
       TERN_(HAS_RESUME_CONTINUE, wait_for_user_response(0, true)); // Wait for LCD click or M108
 
       TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_do(PROMPT_INFO, GET_TEXT_F(MSG_REHEATING)));
-
       TERN_(EXTENSIBLE_UI, ExtUI::onStatusChanged(GET_TEXT_F(MSG_REHEATING)));
-
       TERN_(DWIN_LCD_PROUI, LCD_MESSAGE(MSG_REHEATING));
 
       // Re-enable the heaters if they timed out
       HOTEND_LOOP() thermalManager.reset_hotend_idle_timer(e);
+      //Hotend on
+      HOTEND_LOOP() {
+        thermalManager.setTargetHotend(nozzleTargetHot, e);
+        thermalManager.temp_hotend[e].soft_pwm_amount = nozzleTargetHot;
+      }
 
       // Wait for the heaters to reach the target temperatures
       ensure_safe_temperature(false);
@@ -565,8 +575,6 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
       show_continue_prompt(is_reload);
 
       // Start the heater idle timers
-      const millis_t nozzle_timeout = SEC_TO_MS(PAUSE_PARK_NOZZLE_TIMEOUT);
-
       HOTEND_LOOP() thermalManager.heater_idle[e].start(nozzle_timeout);
 
       TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_do(PROMPT_USER_CONTINUE, GET_TEXT_F(MSG_REHEATDONE), FPSTR(CONTINUE_STR)));

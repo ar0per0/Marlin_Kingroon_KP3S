@@ -384,6 +384,7 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
   #define HAS_FAN_LOGIC 1
 #endif
 
+void do_preheat_end_m();
 class Temperature {
 
   public:

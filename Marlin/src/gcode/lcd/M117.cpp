@@ -33,7 +33,10 @@
 void GcodeSuite::M117() {
 
   if (parser.string_arg && parser.string_arg[0])
-    ui.set_status(parser.string_arg, true);
+    if(!strcmp(parser.string_arg, "Purge extruder")) //igual = 0
+      ui.set_status(parser.string_arg, false, 15);
+    else
+      ui.set_status(parser.string_arg, true);
   else
     ui.reset_status();
 

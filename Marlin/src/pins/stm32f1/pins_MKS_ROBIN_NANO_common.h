@@ -107,7 +107,7 @@
 
 #if HOTENDS == 1 && DISABLED(HEATERS_PARALLEL)
   #ifndef FAN1_PIN
-    #define FAN1_PIN                        PB0
+    //#define FAN1_PIN                        PB0 //board Kingroon, no tiene 2 conector de ventilador
   #endif
 #elif !defined(HEATER_1_PIN)
   #define HEATER_1_PIN                      PB0

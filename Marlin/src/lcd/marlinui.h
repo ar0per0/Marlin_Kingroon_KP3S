@@ -374,7 +374,7 @@ public:
     static void set_status_reset_fn(const statusResetFunc_t=nullptr) {}
   #endif
 
-  static void set_status(const char * const cstr, const bool persist=false);
+  static void set_status(const char * const cstr, const bool persist = false, const int8_t secons = 0);
   static void set_status(FSTR_P const fstr, const int8_t level=0);
   static void status_printf(int8_t level, FSTR_P const fmt, ...);
 
@@ -771,7 +771,7 @@ private:
   #endif
 
   #if HAS_STATUS_MESSAGE
-    static void finish_status(const bool persist);
+    static void finish_status(const bool persist, const int8_t secons = 0);
   #endif
 
   #if HAS_WIRED_LCD

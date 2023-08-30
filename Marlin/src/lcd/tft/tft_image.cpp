@@ -61,6 +61,7 @@ const tImage Cancel_64x64x4         = { (void *)cancel_64x64x4, 64, 64, GREYSCAL
 const tImage Increase_64x64x4       = { (void *)increase_64x64x4, 64, 64, GREYSCALE4 };
 const tImage Decrease_64x64x4       = { (void *)decrease_64x64x4, 64, 64, GREYSCALE4 };
 const tImage Pause_64x64x4          = { (void *)pause_64x64x4, 64, 64, GREYSCALE4 };
+const tImage Filament_64x64x4          = { (void *)filament_64x64x4, 64, 64, GREYSCALE4 };
 
 const tImage Feedrate_32x32x4       = { (void *)feedrate_32x32x4, 32, 32, GREYSCALE4 };
 const tImage Flowrate_32x32x4       = { (void *)flowrate_32x32x4, 32, 32, GREYSCALE4 };
@@ -105,7 +106,9 @@ const tImage Images[imgCount] = {
   Refresh_32x32x4,
   Leveling_32x32x4,
   Slider8x16x4,
+  Pause_64x64x4,
   Home_64x64x4,
+  Filament_64x64x4,
   BtnRounded_64x52x4,
   BtnRounded_42x39x4,
 };

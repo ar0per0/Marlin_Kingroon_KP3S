@@ -51,6 +51,7 @@ extern const uint8_t increase_64x64x4[];
 extern const uint8_t decrease_64x64x4[];
 extern const uint8_t pause_64x64x4[];
 
+extern const uint8_t filament_64x64x4[];
 extern const uint8_t feedrate_32x32x4[];
 extern const uint8_t flowrate_32x32x4[];
 extern const uint8_t directory_32x32x4[];
@@ -94,7 +95,9 @@ enum MarlinImage : uint8_t {
   imgRefresh,
   imgLeveling,
   imgSlider,
+  imgPause,
   imgHome,
+  imgFilament,
   imgBtn52Rounded,
   imgBtn39Rounded,
   imgCount,

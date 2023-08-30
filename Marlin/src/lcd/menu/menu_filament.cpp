@@ -94,7 +94,7 @@ void _menu_temp_filament_op(const PauseMode mode, const int8_t extruder) {
   const int8_t old_index = MenuItemBase::itemIndex;
   START_MENU();
   if (LCD_HEIGHT >= 4) STATIC_ITEM_F(change_filament_header(mode), SS_DEFAULT|SS_INVERT);
-  BACK_ITEM(MSG_BACK);
+  //BACK_ITEM(MSG_BACK);
   #if HAS_PREHEAT
     LOOP_L_N(m, PREHEAT_COUNT)
       ACTION_ITEM_N_f(m, ui.get_preheat_label(m), MSG_PREHEAT_M, _change_filament_with_preset);
@@ -130,7 +130,7 @@ void menu_change_filament() {
     #endif
 
     START_MENU();
-    BACK_ITEM(MSG_MAIN);
+    //BACK_ITEM(MSG_MAIN);
 
     // Change filament
     #if E_STEPPERS == 1
@@ -254,7 +254,9 @@ void menu_pause_option() {
   #if LCD_HEIGHT > 2
     STATIC_ITEM(MSG_FILAMENT_CHANGE_OPTION_HEADER);
   #endif
+
   ACTION_ITEM(MSG_FILAMENT_CHANGE_OPTION_PURGE, []{ pause_menu_response = PAUSE_RESPONSE_EXTRUDE_MORE; });
+  ACTION_ITEM(MSG_FILAMENTUNLOAD, []{ pause_menu_response = PAUSE_RESPONSE_UNLOAD_FILAMENT; });
 
   #if HAS_FILAMENT_SENSOR
     const bool still_out = runout.filament_ran_out;
@@ -265,7 +267,7 @@ void menu_pause_option() {
   #endif
 
   if (!still_out)
-    ACTION_ITEM(MSG_FILAMENT_CHANGE_OPTION_RESUME, []{ pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT; });
+    CONFIRM_ITEM(MSG_FILAMENT_CHANGE_OPTION_RESUME, MSG_FILAMENT_CHANGE_OPTION_RESUME, MSG_BUTTON_CANCEL, []{ pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT; }, nullptr, GET_TEXT_F(MSG_FILAMENT_CHANGE_OPTION_RESUME));
 
   END_MENU();
 }

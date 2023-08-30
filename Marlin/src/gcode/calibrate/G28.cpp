@@ -203,6 +203,7 @@
  *  Z   Home to the Z endstop
  */
 void GcodeSuite::G28() {
+  bool printIsActive = printingIsActive();
   DEBUG_SECTION(log_G28, "G28", DEBUGGING(LEVELING));
   if (DEBUGGING(LEVELING)) log_machine_info();
 
@@ -400,14 +401,16 @@ void GcodeSuite::G28() {
 
     TERN_(HOME_Z_FIRST, if (doZ) homeaxis(Z_AXIS));
 
-    const bool seenR = parser.seenval('R');
-    const float z_homing_height = seenR ? parser.value_linear_units() : Z_HOMING_HEIGHT;
+    if(!printIsActive){
+      const bool seenR = parser.seenval('R');
+      const float z_homing_height = seenR ? parser.value_linear_units() : Z_HOMING_HEIGHT;
 
-    if (z_homing_height && (seenR || NUM_AXIS_GANG(doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK))) {
-      // Raise Z before homing any other axes and z is not already high enough (never lower z)
-      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Raise Z (before homing) by ", z_homing_height);
-      do_z_clearance(z_homing_height);
-      TERN_(BLTOUCH, bltouch.init());
+      if (z_homing_height && (seenR || NUM_AXIS_GANG(doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK))) {
+        // Raise Z before homing any other axes and z is not already high enough (never lower z)
+        if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Raise Z (before homing) by ", z_homing_height);
+        do_z_clearance(z_homing_height);
+        TERN_(BLTOUCH, bltouch.init());
+      }
     }
 
     // Diagonal move first if both are homing
@@ -462,7 +465,8 @@ void GcodeSuite::G28() {
         #else
           homeaxis(Z_AXIS);
         #endif
-        probe.move_z_after_homing();
+        if(!printIsActive)
+          probe.move_z_after_homing();
       }
     #endif
 

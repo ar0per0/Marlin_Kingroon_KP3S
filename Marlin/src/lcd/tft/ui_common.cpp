@@ -168,7 +168,7 @@ void MenuItem_static::draw(const uint8_t row, FSTR_P const fstr, const uint8_t s
   menu_item(row);
   tft_string.set(fstr, itemIndex, itemStringC, itemStringF);
   if (vstr) tft_string.add(vstr);
-  tft.add_text(tft_string.center(TFT_WIDTH), MENU_TEXT_Y_OFFSET, COLOR_YELLOW, tft_string);
+  tft.add_text(tft_string.center(TFT_WIDTH), MENU_TEXT_Y_OFFSET, COLOR_WHITE, tft_string);
 }
 
 #if ENABLED(SDSUPPORT)

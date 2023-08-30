@@ -120,9 +120,9 @@ struct duration_t {
    *
    * Output examples:
    *  123456789012345678901 (strlen)
-   *  135y 364d 23h 59m 59s
-   *  364d 23h 59m 59s
-   *  23h 59m 59s
+   *  135y 364d 23h 59m
+   *  364d 23h 59m
+   *  23h 59m
    *  59m 59s
    *  59s
    */
@@ -133,9 +133,9 @@ struct duration_t {
                    m = this->minute() % 60,
                    s = this->second() % 60;
 
-         if (y) sprintf_P(buffer, PSTR("%iy %id %ih %im %is"), y, d, h, m, s);
-    else if (d) sprintf_P(buffer, PSTR("%id %ih %im %is"), d, h, m, s);
-    else if (h) sprintf_P(buffer, PSTR("%ih %im %is"), h, m, s);
+         if (y) sprintf_P(buffer, PSTR("%iy %id %ih %im"), y, d, h, m);
+    else if (d) sprintf_P(buffer, PSTR("%id %ih %im"), d, h, m);
+    else if (h) sprintf_P(buffer, PSTR("%ih %im"), h, m);
     else if (m) sprintf_P(buffer, PSTR("%im %is"), m, s);
     else sprintf_P(buffer, PSTR("%is"), s);
     return buffer;

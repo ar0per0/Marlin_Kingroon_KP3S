@@ -40,6 +40,8 @@ bool Stopwatch::stop() {
     TERN_(EXTENSIBLE_UI, ExtUI::onPrintTimerStopped());
     state = STOPPED;
     stopTimestamp = millis();
+    extern bool printFi;
+    printFi = true;
     return true;
   }
   else return false;

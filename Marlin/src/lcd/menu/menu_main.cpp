@@ -71,6 +71,51 @@ void menu_cancelobject();
 void menu_motion();
 void menu_temperature();
 void menu_configuration();
+void _menu_temp_filament_op(const PauseMode mode, const int8_t extruder);
+void lcd_cooldown();
+void menu_personal_filament(){
+  START_MENU();
+
+  #if HAS_PREHEAT
+    LOOP_L_N(m, PREHEAT_COUNT) {
+      editable.int8 = m;
+      ACTION_ITEM_f(ui.get_preheat_label(m), MSG_PREHEAT_M_END, do_preheat_end_m);
+    }
+    STATIC_ITEM_F(F("____________________________")); 
+  #endif
+
+  // Cooldown
+  #if HAS_TEMP_HOTEND || HAS_HEATED_BED
+    bool has_heat = false;
+    HOTEND_LOOP() if (thermalManager.degTargetHotend(HOTEND_INDEX)) { has_heat = true; break; }
+    if (TERN0(HAS_HEATED_BED, thermalManager.degTargetBed())) has_heat = true;
+    if (has_heat) ACTION_ITEM(MSG_COOLDOWN, lcd_cooldown);
+  #endif
+
+  // Unload filament
+  FSTR_P const msg_unload = GET_TEXT_F(MSG_FILAMENTUNLOAD);
+  if (thermalManager.targetTooColdToExtrude(active_extruder))
+    SUBMENU_F(msg_unload, []{ _menu_temp_filament_op(PAUSE_MODE_UNLOAD_FILAMENT, 0); });
+  else
+    GCODES_ITEM_F(msg_unload, F("M702"));
+
+  // Load filament
+  FSTR_P const msg_load = GET_TEXT_F(MSG_FILAMENTLOAD);
+  if (thermalManager.targetTooColdToExtrude(active_extruder))
+    SUBMENU_F(msg_load, []{ _menu_temp_filament_op(PAUSE_MODE_LOAD_FILAMENT, 0); });
+  else
+    GCODES_ITEM_F(msg_load, F("M701"));
+
+  // Change filament
+  FSTR_P const fmsg = GET_TEXT_F(MSG_FILAMENTCHANGE);
+  if (thermalManager.targetTooColdToExtrude(active_extruder))
+    SUBMENU_F(fmsg, []{ _menu_temp_filament_op(PAUSE_MODE_CHANGE_FILAMENT, 0); });
+  else
+     GCODES_ITEM_F(fmsg, F("M600 B0"));
+
+
+  END_MENU();
+}
 
 #if HAS_POWER_MONITOR
   void menu_power_monitor();
@@ -114,7 +159,7 @@ void menu_configuration();
 
   void custom_menus_main() {
     START_MENU();
-    BACK_ITEM(MSG_MAIN);
+    //BACK_ITEM(MSG_MAIN);
 
     #define HAS_CUSTOM_ITEM_MAIN(N) (defined(MAIN_MENU_ITEM_##N##_DESC) && defined(MAIN_MENU_ITEM_##N##_GCODE))
 
@@ -231,46 +276,8 @@ void menu_main() {
   ;
 
   START_MENU();
-  BACK_ITEM(MSG_INFO_SCREEN);
+  //BACK_ITEM(MSG_INFO_SCREEN);
 
-  #if ENABLED(SDSUPPORT)
-
-    #if !defined(MEDIA_MENU_AT_TOP) && !HAS_ENCODER_WHEEL
-      #define MEDIA_MENU_AT_TOP
-    #endif
-
-    auto sdcard_menu_items = [&]{
-      #if ENABLED(MENU_ADDAUTOSTART)
-        ACTION_ITEM(MSG_RUN_AUTO_FILES, card.autofile_begin); // Run Auto Files
-      #endif
-
-      if (card_detected) {
-        if (!card_open) {
-          #if HAS_SD_DETECT
-            GCODES_ITEM(MSG_CHANGE_MEDIA, F("M21"));        // M21 Change Media
-          #else                                             // - or -
-            ACTION_ITEM(MSG_RELEASE_MEDIA, []{              // M22 Release Media
-              queue.inject(F("M22"));
-              #if ENABLED(TFT_COLOR_UI)
-                // Menu display issue on item removal with multi language selection menu
-                if (encoderTopLine > 0) encoderTopLine--;
-                ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
-              #endif
-            });
-          #endif
-          SUBMENU(MSG_MEDIA_MENU, MEDIA_MENU_GATEWAY);      // Media Menu (or Password First)
-        }
-      }
-      else {
-        #if HAS_SD_DETECT
-          ACTION_ITEM(MSG_NO_MEDIA, nullptr);               // "No Media"
-        #else
-          GCODES_ITEM(MSG_ATTACH_MEDIA, F("M21"));          // M21 Attach Media
-        #endif
-      }
-    };
-
-  #endif
 
   if (busy) {
     #if MACHINE_CAN_PAUSE
@@ -278,11 +285,7 @@ void menu_main() {
     #endif
     #if MACHINE_CAN_STOP
       SUBMENU(MSG_STOP_PRINT, []{
-        MenuItem_confirm::select_screen(
-          GET_TEXT_F(MSG_BUTTON_STOP), GET_TEXT_F(MSG_BACK),
-          ui.abort_print, nullptr,
-          GET_TEXT_F(MSG_STOP_PRINT), (const char *)nullptr, F("?")
-        );
+        MenuItem_confirm::select_screen(GET_TEXT_F(MSG_BUTTON_STOP), GET_TEXT_F(MSG_BACK), ui.abort_print, nullptr, GET_TEXT_F(MSG_STOP_PRINT), (const char *)nullptr, F("?"));
       });
     #endif
 
@@ -299,9 +302,9 @@ void menu_main() {
   }
   else {
 
-    #if BOTH(SDSUPPORT, MEDIA_MENU_AT_TOP)
-      sdcard_menu_items();
-    #endif
+    //#if BOTH(SDSUPPORT, MEDIA_MENU_AT_TOP)
+    //  sdcard_menu_items();
+    //#endif
 
     if (TERN0(MACHINE_CAN_PAUSE, printingIsPaused()))
       ACTION_ITEM(MSG_RESUME_PRINT, ui.resume_print);
@@ -336,8 +339,6 @@ void menu_main() {
   #if ENABLED(MMU2_MENUS)
     if (!busy) SUBMENU(MSG_MMU2_MENU, menu_mmu2);
   #endif
-
-  SUBMENU(MSG_CONFIGURATION, menu_configuration);
 
   #if ENABLED(CUSTOM_MENU_MAIN)
     if (TERN1(CUSTOM_MENU_MAIN_ONLY_IDLE, !busy)) {
@@ -386,9 +387,46 @@ void menu_main() {
       GCODES_ITEM(MSG_SWITCH_PS_ON, F("M80"));
   #endif
 
-  #if ENABLED(SDSUPPORT) && DISABLED(MEDIA_MENU_AT_TOP)
-    sdcard_menu_items();
+  //#if ENABLED(SDSUPPORT) && DISABLED(MEDIA_MENU_AT_TOP)
+  #if ENABLED(SDSUPPORT)
+
+    #if !defined(MEDIA_MENU_AT_TOP) && !HAS_ENCODER_WHEEL
+      #define MEDIA_MENU_AT_TOP
+    #endif
+
+    #if ENABLED(MENU_ADDAUTOSTART)
+      ACTION_ITEM(MSG_RUN_AUTO_FILES, card.autofile_begin); // Run Auto Files
+    #endif
+
+    if(!busy){
+      if (card_detected) {
+        if (!card_open) {
+          /*#if HAS_SD_DETECT
+            GCODES_ITEM(MSG_CHANGE_MEDIA, F("M21"));        // M21 Change Media
+          #else                                             // - or -
+            ACTION_ITEM(MSG_RELEASE_MEDIA, []{              // M22 Release Media
+              queue.inject(F("M22"));
+              #if ENABLED(TFT_COLOR_UI)
+                // Menu display issue on item removal with multi language selection menu
+                if (encoderTopLine > 0) encoderTopLine--;
+                ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
+              #endif
+            });
+          #endif*/
+          SUBMENU(MSG_MEDIA_MENU, MEDIA_MENU_GATEWAY);      // Media Menu (or Password First)
+        }
+      }
+      else {
+        #if HAS_SD_DETECT
+          ACTION_ITEM(MSG_NO_MEDIA, nullptr);               // "No Media"
+        #else
+          GCODES_ITEM(MSG_ATTACH_MEDIA, F("M21"));          // M21 Attach Media
+        #endif
+      }
+    }
+
   #endif
+  //#endif
 
   #if HAS_SERVICE_INTERVALS
     static auto _service_reset = [](const int index) {
@@ -458,6 +496,7 @@ void menu_main() {
     });
   #endif
 
+  SUBMENU(MSG_CONFIGURATION, menu_configuration); 
   END_MENU();
 }
 

@@ -33,17 +33,18 @@ namespace Language_es {
 
   constexpr uint8_t CHARSIZE              = 2;
   LSTR LANGUAGE                           = _UxGT("Spanish");
+  LSTR MSG_SETTINGS_STORED                = _UxGT("Config. Guardada");
 
   LSTR WELCOME_MSG                        = MACHINE_NAME _UxGT(" Lista");
   LSTR MSG_YES                            = _UxGT("SI");
   LSTR MSG_NO                             = _UxGT("NO");
   LSTR MSG_BACK                           = _UxGT("Atrás");
   LSTR MSG_MEDIA_ABORTING                 = _UxGT("Cancelando...");
-  LSTR MSG_MEDIA_INSERTED                 = _UxGT("SD/FD insertado");
-  LSTR MSG_MEDIA_REMOVED                  = _UxGT("SD/FD retirado");
-  LSTR MSG_MEDIA_WAITING                  = _UxGT("Esperando al SD/FD");
-  LSTR MSG_MEDIA_INIT_FAIL                = _UxGT("Fallo al iniciar SD/FD");
-  LSTR MSG_MEDIA_READ_ERROR               = _UxGT("Error lectura SD/FD");
+  LSTR MSG_MEDIA_INSERTED                 = _UxGT("SD insertada");
+  LSTR MSG_MEDIA_REMOVED                  = _UxGT("SD retirada");
+  LSTR MSG_MEDIA_WAITING                  = _UxGT("Esperando al SD");
+  LSTR MSG_MEDIA_INIT_FAIL                = _UxGT("Fallo al iniciar SD");
+  LSTR MSG_MEDIA_READ_ERROR               = _UxGT("Error lectura SD");
   LSTR MSG_MEDIA_USB_REMOVED              = _UxGT("Disp. USB retirado");
   LSTR MSG_MEDIA_USB_FAILED               = _UxGT("Inicio USB fallido");
   LSTR MSG_KILL_SUBCALL_OVERFLOW          = _UxGT("Desbordamiento de subllamada");
@@ -57,10 +58,10 @@ namespace Language_es {
   LSTR MSG_DEBUG_MENU                     = _UxGT("Menú depuración");
   LSTR MSG_PROGRESS_BAR_TEST              = _UxGT("Prob. barra progreso");
   LSTR MSG_HOMING                         = _UxGT("Origen");
-  LSTR MSG_AUTO_HOME                      = _UxGT("Llevar al origen");
-  LSTR MSG_AUTO_HOME_X                    = _UxGT("Origen X");
-  LSTR MSG_AUTO_HOME_Y                    = _UxGT("Origen Y");
-  LSTR MSG_AUTO_HOME_Z                    = _UxGT("Origen Z");
+  LSTR MSG_AUTO_HOME                      = _UxGT("Home XYZ");
+  LSTR MSG_AUTO_HOME_X                    = _UxGT("Home X");
+  LSTR MSG_AUTO_HOME_Y                    = _UxGT("Home Y");
+  LSTR MSG_AUTO_HOME_Z                    = _UxGT("Home Z");
   LSTR MSG_AUTO_Z_ALIGN                   = _UxGT("Auto alineado Z");
   LSTR MSG_ITERATION                      = _UxGT("G34 Iteración: %i");
   LSTR MSG_DECREASING_ACCURACY            = _UxGT("¡Precisión disminuyendo!");
@@ -230,6 +231,7 @@ namespace Language_es {
   LSTR MSG_MOVE_E                         = _UxGT("Extrusor");
   LSTR MSG_MOVE_EN                        = _UxGT("Extrusor *");
   LSTR MSG_HOTEND_TOO_COLD                = _UxGT("Hotend muy frio");
+  LSTR MSG_HOTEND_COLD                    = _UxGT("Muy frio");
   LSTR MSG_MOVE_N_MM                      = _UxGT("Mover $mm");
   LSTR MSG_MOVE_01MM                      = _UxGT("Mover 0.1mm");
   LSTR MSG_MOVE_1MM                       = _UxGT("Mover 1mm");
@@ -317,7 +319,7 @@ namespace Language_es {
   LSTR MSG_ERR_EEPROM_CRC                 = _UxGT("Err: EEPROM CRC");
   LSTR MSG_ERR_EEPROM_INDEX               = _UxGT("Err: Índice EEPROM");
   LSTR MSG_ERR_EEPROM_VERSION             = _UxGT("Err: Versión EEPROM");
-  LSTR MSG_MEDIA_UPDATE                   = _UxGT("Actualizar SD/FD");
+  LSTR MSG_MEDIA_UPDATE                   = _UxGT("Actualizar SD");
   LSTR MSG_RESET_PRINTER                  = _UxGT("Resetear Impresora");
   LSTR MSG_REFRESH                        = LCD_STR_REFRESH  _UxGT("Recargar");
   LSTR MSG_INFO_SCREEN                    = _UxGT("Pantalla de Inf.");
@@ -340,13 +342,13 @@ namespace Language_es {
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Cancelar Objeto");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Cancelar Objeto =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Rec. Fallo electrico");
-  LSTR MSG_MEDIA_MENU                     = _UxGT("Imprim. desde SD/FD");
-  LSTR MSG_NO_MEDIA                       = _UxGT("SD/FD no presente");
+  LSTR MSG_MEDIA_MENU                     = _UxGT("Imprim. desde SD");
+  LSTR MSG_NO_MEDIA                       = _UxGT("SD no presente");
   LSTR MSG_DWELL                          = _UxGT("Reposo...");
   LSTR MSG_USERWAIT                       = _UxGT("Pulsar para Reanudar");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Impresión Pausada");
   LSTR MSG_PRINTING                       = _UxGT("Imprimiendo...");
-  LSTR MSG_PRINT_ABORTED                  = _UxGT("Impresión cancelada");
+  LSTR MSG_PRINT_ABORTED                  = _UxGT("Impresión Cancelada");
   LSTR MSG_PRINT_DONE                     = _UxGT("Impresión Completada");
   LSTR MSG_NO_MOVE                        = _UxGT("Sin movimiento");
   LSTR MSG_KILLED                         = _UxGT("MUERTA");
@@ -373,9 +375,9 @@ namespace Language_es {
   LSTR MSG_FILAMENTUNLOAD                 = _UxGT("Descargar filamento");
   LSTR MSG_FILAMENTUNLOAD_E               = _UxGT("Descargar fil. *");
   LSTR MSG_FILAMENTUNLOAD_ALL             = _UxGT("Descargar todo");
-  LSTR MSG_ATTACH_MEDIA                   = _UxGT("Iniciar SD/FD");
-  LSTR MSG_CHANGE_MEDIA                   = _UxGT("Cambiar SD/FD");
-  LSTR MSG_RELEASE_MEDIA                  = _UxGT("Lanzar SD/FD");
+  LSTR MSG_ATTACH_MEDIA                   = _UxGT("Iniciar SD");
+  LSTR MSG_CHANGE_MEDIA                   = _UxGT("Cambiar SD");
+  LSTR MSG_RELEASE_MEDIA                  = _UxGT("Lanzar SD");
   LSTR MSG_ZPROBE_OUT                     = _UxGT("Sonda Z fuera cama");
   LSTR MSG_SKEW_FACTOR                    = _UxGT("Factor de desviación");
   LSTR MSG_BLTOUCH                        = _UxGT("BLTouch");
@@ -416,7 +418,7 @@ namespace Language_es {
   LSTR MSG_THERMAL_RUNAWAY_CHAMBER        = _UxGT("FUGA TÉRMICA CAMARA");
   LSTR MSG_ERR_MAXTEMP                    = _UxGT("Err:TEMP. MÁX");
   LSTR MSG_ERR_MINTEMP                    = _UxGT("Err:TEMP. MIN");
-  LSTR MSG_HALTED                         = _UxGT("IMPRESORA DETENIDA");
+  LSTR MSG_HALTED                         = _UxGT("IMP. DETENIDA");
   LSTR MSG_PLEASE_RESET                   = _UxGT("Por favor, reinicie");
   LSTR MSG_HEATING                        = _UxGT("Calentando...");
   LSTR MSG_COOLING                        = _UxGT("Enfriando...");
@@ -476,6 +478,7 @@ namespace Language_es {
   LSTR MSG_ERROR_TMC                      = _UxGT("ERROR CONEX. TMC");
   LSTR MSG_DAC_EEPROM_WRITE               = _UxGT("Escribe DAC EEPROM");
   LSTR MSG_FILAMENT_CHANGE_HEADER         = _UxGT("CAMBIAR FILAMENTO");
+  LSTR MSG_PAUSING                        = _UxGT("Pausando...");
   LSTR MSG_FILAMENT_CHANGE_HEADER_PAUSE   = _UxGT("IMPRESIÓN PAUSADA");
   LSTR MSG_FILAMENT_CHANGE_HEADER_LOAD    = _UxGT("CARGAR FILAMENTO");
   LSTR MSG_FILAMENT_CHANGE_HEADER_UNLOAD  = _UxGT("DESCARGAR FILAMENTO");
@@ -535,11 +538,11 @@ namespace Language_es {
   LSTR MSG_MAZE                           = _UxGT("Maze");
 
   #if LCD_HEIGHT >= 4
-    LSTR MSG_ADVANCED_PAUSE_WAITING       = _UxGT(MSG_2_LINE("Pulsar el botón para", "reanudar impresión"));
+    LSTR MSG_ADVANCED_PAUSE_WAITING       = _UxGT(MSG_2_LINE("Pulsar para", "reanudar impresión"));
     LSTR MSG_PAUSE_PRINT_PARKING          = _UxGT(MSG_1_LINE("Aparcando..."));
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Esperando para", "iniciar el cambio", "de filamento"));
-    LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Inserte el filamento", "y pulse el botón", "para continuar..."));
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Pulse el botón para", "calentar la boquilla"));
+    LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Inserte el filamento", "y pulse", "para continuar..."));
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Pulse para", "calentar la boquilla"));
     LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Calentando boquilla", "Espere por favor..."));
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("Espere para", "liberar el filamento"));
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("Espere para", "cargar el filamento"));

@@ -480,6 +480,7 @@ void Stepper::enable_axis(const AxisEnum axis) {
 
 bool Stepper::disable_axis(const AxisEnum axis) {
   mark_axis_disabled(axis);
+  set_axis_unhomed(axis);
 
   TERN_(DWIN_LCD_PROUI, set_axis_untrusted(axis)); // MRISCOC workaround: https://github.com/MarlinFirmware/Marlin/issues/23095
 
@@ -545,6 +546,7 @@ void Stepper::disable_all_steppers() {
     disable_axis(I_AXIS), disable_axis(J_AXIS), disable_axis(K_AXIS)
   );
   disable_e_steppers();
+  set_all_unhomed();
 
   TERN_(EXTENSIBLE_UI, ExtUI::onSteppersDisabled());
 }

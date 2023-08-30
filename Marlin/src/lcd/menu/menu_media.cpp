@@ -119,7 +119,7 @@ void menu_media_filelist() {
   #if ENABLED(MULTI_VOLUME)
     ACTION_ITEM(MSG_BACK, []{ ui.goto_screen(menu_media); });
   #else
-    BACK_ITEM_F(TERN1(BROWSE_MEDIA_ON_INSERT, screen_history_depth) ? GET_TEXT_F(MSG_MAIN) : GET_TEXT_F(MSG_BACK));
+    STATIC_ITEM_F(TERN1(BROWSE_MEDIA_ON_INSERT, screen_history_depth) ? F("SD") : F("SD"));
   #endif
   if (card.flag.workDirIsRoot) {
     #if !HAS_SD_DETECT

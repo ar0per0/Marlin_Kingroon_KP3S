@@ -32,6 +32,7 @@
 
 // 16 bit color generator: https://ee-programming-notepad.blogspot.com/2016/10/16-bit-color-generator-picker.html
 // RGB565 color picker:  https://trolsoft.ru/en/articles/rgb565-color-picker
+// HEX to 16 bit https://rgbcolorpicker.com/565
 
 #define COLOR_BLACK           0x0000  // #000000
 #define COLOR_WHITE           0xFFFF  // #FFFFFF
@@ -70,11 +71,13 @@
 
 #define COLOR_DARK_PURPLE     0x9930  // #992380
 
+#define COLOR_KINGROON_MENU  0xB240 // #B34704
+
 #ifndef COLOR_BACKGROUND
-  #define COLOR_BACKGROUND    0x20AC  // #1E156E
+  #define COLOR_BACKGROUND    COLOR_BLACK
 #endif
 #ifndef COLOR_SELECTION_BG
-  #define COLOR_SELECTION_BG  0x9930  // #992380
+  #define COLOR_SELECTION_BG  COLOR_KINGROON_MENU
 #endif
 #ifndef COLOR_WEBSITE_URL
   #define COLOR_WEBSITE_URL   0x03B7  // #0075BD
@@ -117,17 +120,17 @@
 #endif
 
 #ifndef COLOR_PRINT_TIME
-  #define COLOR_PRINT_TIME        COLOR_AQUA
+  #define COLOR_PRINT_TIME        COLOR_WHITE
 #endif
 
 #ifndef COLOR_PROGRESS_FRAME
   #define COLOR_PROGRESS_FRAME    COLOR_WHITE
 #endif
 #ifndef COLOR_PROGRESS_BAR
-  #define COLOR_PROGRESS_BAR      COLOR_BLUE
+  #define COLOR_PROGRESS_BAR      0x2CA2 //#299414
 #endif
 #ifndef COLOR_PROGRESS_BG
-  #define COLOR_PROGRESS_BG       COLOR_BLACK
+  #define COLOR_PROGRESS_BG       COLOR_GREY
 #endif
 
 #ifndef COLOR_STATUS_MESSAGE
@@ -151,7 +154,7 @@
 #endif
 
 #ifndef COLOR_MENU_TEXT
-  #define COLOR_MENU_TEXT         COLOR_YELLOW
+  #define COLOR_MENU_TEXT         COLOR_WHITE
 #endif
 #ifndef COLOR_MENU_VALUE
   #define COLOR_MENU_VALUE        COLOR_WHITE

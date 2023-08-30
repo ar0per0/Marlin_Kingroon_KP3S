@@ -115,7 +115,11 @@ void GcodeSuite::M600() {
   #endif
 
   // Initial retract before move to filament change position
-  const float retract = -ABS(parser.axisunitsval('E', E_AXIS, PAUSE_PARK_RETRACT_LENGTH));
+  #ifdef AUTO_UNLOAD_FILAMENT
+    const float retract = -ABS(parser.axisunitsval('E', E_AXIS, PAUSE_PARK_RETRACT_LENGTH));
+  #else
+    const float retract = 0;
+  #endif
 
   xyz_pos_t park_point NOZZLE_PARK_POINT;
 
@@ -135,7 +139,11 @@ void GcodeSuite::M600() {
 
   // Unload filament
   // For MMU2, when enabled, reset retract value so it doesn't mess with MMU filament handling
-  const float unload_length = standardM600 ? -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_extruder].unload_length)) : 0.5f;
+  #ifdef AUTO_UNLOAD_FILAMENT
+    const float unload_length = standardM600 ? -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_extruder].unload_length)) : 0.5f;
+  #else
+    const float unload_length = 0;
+  #endif
 
   const int beep_count = parser.intval('B', -1
     #ifdef FILAMENT_CHANGE_ALERT_BEEPS
