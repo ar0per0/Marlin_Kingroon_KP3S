@@ -7,5 +7,6 @@
 Sé ha modificado para adaptar los iconos y formato de Marlin a la pantalla vertical de la Kingroon KP3S.
 
 No se han comprobado todas las pantallas/opciones que dispone Marlin, si se modifican los ficheros de configuración Configuration.h y Configuracion_adv.h no se asegura que se visualice correctamente.
+- M955 --> Calibrar pantalla táctil, en caso de que no coincide los toques con la orientación
 
 <img src="pantalla_KingroonKP3S.gif"/>
